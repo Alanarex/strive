@@ -17,6 +17,7 @@ import {
   requestBackgroundPermissions,
   isBackgroundLocationAvailable,
 } from '../services/locationService';
+import { readBackgroundLocations, clearBackgroundLocations } from '../services/backgroundStore';
 import { saveActivity } from '../services/database';
 import {
   shouldAddPoint,
@@ -105,6 +106,17 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
       setState('recording');
       startTimer();
 
+      // import any locations the background task may have persisted while app was suspended
+      try {
+        const pending = await readBackgroundLocations();
+        if (pending.length > 0) {
+          for (const p of pending) handleLocation(p);
+          await clearBackgroundLocations();
+        }
+      } catch (e) {
+        console.warn('Failed to import pending bg locations', e);
+      }
+
       const bgAvailable = await isBackgroundLocationAvailable();
       try {
         if (bgAvailable) {
@@ -145,6 +157,16 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
     startTimeRef.current = Date.now();
     setState('recording');
     startTimer();
+    // merge persisted background points (if any)
+    try {
+      const pending = await readBackgroundLocations();
+      if (pending.length > 0) {
+        for (const p of pending) handleLocation(p);
+        await clearBackgroundLocations();
+      }
+    } catch (e) {
+      console.warn('Failed to import pending bg locations on resume', e);
+    }
     const bgAvailable = await isBackgroundLocationAvailable();
     try {
       if (bgAvailable) {

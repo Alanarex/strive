@@ -202,3 +202,9 @@ export async function getActivityById(
     recordingState: 'completed' as const,
   };
 }
+
+export async function deleteActivity(id: string, userId: string): Promise<void> {
+  await initDatabase();
+  if (!db) throw new Error('Database not initialized');
+  await db.runAsync(`DELETE FROM activities WHERE id = ? AND user_id = ?`, [id, userId]);
+}

@@ -6,6 +6,7 @@
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import type { GPSPoint } from '../types';
+import { appendBackgroundLocations } from './backgroundStore';
 
 const BACKGROUND_TASK_NAME = 'STRIVE_LOCATION_TASK';
 
@@ -26,8 +27,18 @@ TaskManager.defineTask(BACKGROUND_TASK_NAME, ({
     console.error('Background location error:', error);
     return Promise.resolve();
   }
-  if (data?.locations && locationCallback) {
-    locationCallback(data.locations);
+  if (data?.locations) {
+    // convert and persist locations so the app can merge them on resume
+    try {
+      const pts: GPSPoint[] = data.locations.map((loc) => convertToGPSPoint(loc));
+      appendBackgroundLocations(pts);
+    } catch (e) {
+      console.warn('Failed to persist bg locations', e);
+    }
+    if (locationCallback) {
+      locationCallback(data.locations);
+    }
+    console.log(`Background task received ${data.locations.length} location(s)`);
   }
   return Promise.resolve();
 });

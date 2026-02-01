@@ -8,11 +8,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import globalStyles from '../constants/globalStyles';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 
@@ -41,16 +41,16 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }: Props) {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={["top","bottom"]}>
+    <SafeAreaView style={[globalStyles.container, { paddingTop: insets.top }]} edges={["top","bottom"]}>
       <KeyboardAvoidingView
-        style={styles.container}
+        style={globalStyles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-      <Text style={styles.title}>Strive</Text>
-      <Text style={styles.subtitle}>Connectez-vous pour continuer</Text>
-      <View style={styles.form}>
+      <Text style={globalStyles.big_title}>Strive</Text>
+      <Text style={[globalStyles.card_text, { textAlign: 'center' }]}>Connectez-vous pour continuer</Text>
+      <View style={globalStyles.flex_column}>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="Email"
           placeholderTextColor={COLORS.textMuted}
           value={email}
@@ -60,7 +60,7 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }: Props) {
           autoCorrect={false}
         />
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="Mot de passe"
           placeholderTextColor={COLORS.textMuted}
           value={password}
@@ -68,19 +68,19 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }: Props) {
           secureTextEntry
         />
         <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+          style={[globalStyles.btn,globalStyles.btn_primary , loading && globalStyles.btn_disabled]}
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>
+          <Text style={globalStyles.btn_primary_text}>
             {loading ? 'Connexion...' : 'Se connecter'}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.linkButton}
+          style={globalStyles.link_button}
           onPress={onNavigateToSignup}
         >
-          <Text style={styles.linkText}>
+          <Text style={globalStyles.link_text}>
             Pas de compte ? Créer un compte
           </Text>
         </TouchableOpacity>
@@ -90,58 +90,4 @@ export default function LoginScreen({ onLogin, onNavigateToSignup }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    justifyContent: 'center',
-    padding: SPACING.lg,
-  },
-  title: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-    textAlign: 'center',
-    marginBottom: SPACING.xs,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.xl,
-  },
-  form: {
-    gap: SPACING.md,
-  },
-  input: {
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  button: {
-    backgroundColor: COLORS.primary,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: COLORS.background,
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
-  },
-  linkButton: {
-    padding: SPACING.md,
-    alignItems: 'center',
-  },
-  linkText: {
-    color: COLORS.secondary,
-    fontSize: FONT_SIZES.md,
-  },
-});
+

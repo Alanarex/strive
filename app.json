@@ -41,7 +41,12 @@
           "isAndroidForegroundServiceEnabled": true
         }
       ],
-      ["expo-notifications", { "icon": "./assets/icon.png" }]
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png"
+        }
+      ]
     ]
   }
 }

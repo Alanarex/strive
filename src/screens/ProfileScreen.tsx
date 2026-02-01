@@ -8,14 +8,16 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
   Alert,
   Linking,
   Platform,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import globalStyles from '../constants/globalStyles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Updates from 'expo-updates';
+import { DevSettings } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {
   userName: string;
@@ -33,7 +35,6 @@ export default function ProfileScreen({
   onUpdateProfile,
   onLogout,
 }: Props) {
-  const insets = useSafeAreaInsets();
   const [name, setName] = useState(userName);
   const [email, setEmail] = useState(userEmail);
   const [editing, setEditing] = useState(false);
@@ -65,14 +66,14 @@ export default function ProfileScreen({
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top","bottom"]}>
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
-      <Text style={styles.title}>Profil</Text>
+    <SafeAreaView style={globalStyles.container}>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Informations personnelles</Text>
+      <Text style={globalStyles.title}>Profil</Text>
+
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.card_title}>Informations personnelles</Text>
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="Nom"
           placeholderTextColor={COLORS.textMuted}
           value={name}
@@ -80,7 +81,7 @@ export default function ProfileScreen({
           editable={editing}
         />
         <TextInput
-          style={styles.input}
+          style={globalStyles.input}
           placeholder="Email"
           placeholderTextColor={COLORS.textMuted}
           value={email}
@@ -90,57 +91,100 @@ export default function ProfileScreen({
           editable={editing}
         />
         {editing ? (
-          <View style={styles.editButtons}>
+          <View style={globalStyles.flex_row}>
+
             <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
+              style={[globalStyles.btn, globalStyles.btn_info]}
               onPress={() => {
                 setName(userName);
                 setEmail(userEmail);
                 setEditing(false);
               }}
             >
-              <Text style={styles.buttonText}>Annuler</Text>
+              <Text style={globalStyles.btn_info_text}>Annuler</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={[styles.button, styles.saveButton]}
+              style={[globalStyles.btn, globalStyles.btn_primary, globalStyles.fill]}
               onPress={handleSave}
               disabled={saving}
             >
-              <Text style={styles.buttonText}>
+              <Text style={globalStyles.btn_primary_text}>
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setEditing(true)}
-          >
-            <Text style={styles.buttonText}>Modifier</Text>
-          </TouchableOpacity>
-        )}
+        )
+          :
+          (
+            <TouchableOpacity
+              style={[globalStyles.btn, globalStyles.btn_primary]}
+              onPress={() => setEditing(true)}
+            >
+              <Text style={globalStyles.btn_primary_text}>Modifier</Text>
+            </TouchableOpacity>
+          )}
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Autorisations</Text>
-        <Text style={styles.permissionText}>
-          Strive utilise les autorisations suivantes :
-        </Text>
-        <Text style={styles.permissionItem}>• Localisation : enregistrement des parcours GPS</Text>
-        <Text style={styles.permissionItem}>• Localisation en arrière-plan : suivi écran éteint</Text>
-        <Text style={styles.permissionItem}>• Notifications (optionnel) : rappels</Text>
+      <View style={globalStyles.card}>
+
+        <Text style={globalStyles.card_title}>Autorisations</Text>
+
+        <Text style={globalStyles.card_text}>Strive utilise les autorisations suivantes :</Text>
+
+        <View style={globalStyles.list}>
+          {[
+            'Localisation : enregistrement des parcours GPS',
+            "Localisation en arrière-plan : suivi écran éteint",
+            'Notifications (optionnel) : rappels',
+          ].map((p) => (
+            <View key={p} style={globalStyles.list_item}>
+              <View style={globalStyles.list_bullet} />
+              <Text style={globalStyles.list_text}>{p}</Text>
+            </View>
+          ))}
+        </View>
+
         <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={openSettings}
+          style={[globalStyles.btn, globalStyles.btn_info]}
+          onPress={openSettings}>
+          <Text style={globalStyles.btn_info_text}>Paramètres</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[globalStyles.btn, globalStyles.btn_secondary, { marginTop: SPACING.sm }]}
+          onPress={() => {
+            Alert.alert(
+              'Afficher l\'écran de bienvenue',
+              "Cette action réinitialisera l'écran d'accueil de bienvenue et rechargera l'application.",
+              [
+                { text: 'Annuler', style: 'cancel' },
+                {
+                  text: 'Afficher',
+                  style: 'default',
+                  onPress: async () => {
+                    try {
+                      await AsyncStorage.removeItem('strive_welcome_seen');
+                      if (Updates.reloadAsync) {
+                        await Updates.reloadAsync();
+                      } else {
+                        DevSettings.reload();
+                      }
+                    } catch (e) {
+                      console.warn('Failed to reset welcome flag', e);
+                      try { DevSettings.reload(); } catch {}
+                    }
+                  },
+                },
+              ]
+            );
+          }}
         >
-          <Text style={styles.settingsButtonText}>
-            Gérer les autorisations dans Réglages
-          </Text>
+          <Text style={globalStyles.btn_secondary_text}>Afficher l'écran Bienvenue</Text>
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity
-        style={styles.logoutButton}
+        style={[globalStyles.btn, globalStyles.btn_danger]}
         onPress={() => {
           Alert.alert(
             'Déconnexion',
@@ -152,100 +196,8 @@ export default function ProfileScreen({
           );
         }}
       >
-        <Text style={styles.logoutButtonText}>Se déconnecter</Text>
+        <Text style={globalStyles.btn_danger_text}>Se déconnecter</Text>
       </TouchableOpacity>
-      </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  title: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    padding: SPACING.lg,
-  },
-  card: {
-    backgroundColor: COLORS.surface,
-    marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-    padding: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.md,
-  },
-  input: {
-    backgroundColor: COLORS.background,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    marginBottom: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  editButtons: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-  },
-  button: {
-    flex: 1,
-    backgroundColor: COLORS.primary,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: COLORS.surfaceLight,
-  },
-  saveButton: {
-    backgroundColor: COLORS.primary,
-  },
-  buttonText: {
-    color: COLORS.text,
-    fontWeight: '600',
-  },
-  permissionText: {
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.sm,
-  },
-  permissionItem: {
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-    fontSize: FONT_SIZES.sm,
-  },
-  settingsButton: {
-    marginTop: SPACING.md,
-    padding: SPACING.md,
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
-  },
-  settingsButtonText: {
-    color: COLORS.secondary,
-    fontWeight: '600',
-  },
-  logoutButton: {
-    marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
-    padding: SPACING.md,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: COLORS.error,
-    borderRadius: BORDER_RADIUS.md,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: COLORS.error,
-    fontWeight: '600',
-  },
-});

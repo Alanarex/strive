@@ -3,7 +3,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapView, { Polyline } from 'react-native-maps';
 import { getActivityById } from '../services/database';
@@ -12,7 +14,8 @@ import {
   formatDuration,
   msToKmh,
 } from '../utils/gps';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { COLORS } from '../constants/theme';
+import globalStyles from '../constants/globalStyles';
 
 const ACTIVITY_LABELS: Record<string, string> = {
   run: 'Course',
@@ -28,7 +31,14 @@ interface Props {
 }
 
 export default function ActivityDetailScreen({ activityId, userId }: Props) {
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const [initialRegionState, setInitialRegionState] = useState<null | {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  }>(null);
   const [activity, setActivity] = useState<Awaited<
     ReturnType<typeof getActivityById>
   >>(null);
@@ -41,9 +51,38 @@ export default function ActivityDetailScreen({ activityId, userId }: Props) {
     });
   }, [activityId, userId]);
 
+  useEffect(() => {
+    if (activity) {
+      const title = ACTIVITY_LABELS[activity.type] ?? activity.type ?? 'Détail activité';
+      // @ts-ignore - navigation typed as any here
+      navigation.setOptions?.({ headerTitle: title });
+    }
+  }, [activity, navigation]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') return;
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        if (!mounted || !pos) return;
+        setInitialRegionState({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+      } catch (e) {
+        console.warn('Failed to get initial location for ActivityDetail', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
   if (loading || !activity) {
     return (
-      <View style={styles.centered}>
+      <View style={globalStyles.centered}>
         <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
@@ -77,11 +116,11 @@ export default function ActivityDetailScreen({ activityId, userId }: Props) {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]} edges={["top","bottom"]}>
+    <SafeAreaView style={globalStyles.container}>
       <MapView
-        style={styles.map}
+        style={globalStyles.map}
         initialRegion={
-          region ?? {
+          initialRegionState ?? region ?? {
             latitude: 48.8566,
             longitude: 2.3522,
             latitudeDelta: 0.05,
@@ -98,30 +137,30 @@ export default function ActivityDetailScreen({ activityId, userId }: Props) {
         )}
       </MapView>
 
-      <View style={[styles.details, { marginBottom: insets.bottom + 8 }]}>
-        <Text style={styles.type}>
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.card_title}>
           {ACTIVITY_LABELS[activity.type] ?? activity.type}
         </Text>
-        <Text style={styles.date}>{formatDate(activity.startTime)}</Text>
+        <Text style={globalStyles.date}>{formatDate(activity.startTime)}</Text>
 
-        <View style={styles.metrics}>
-          <View style={styles.metric}>
-            <Text style={styles.metricValue}>
+        <View style={globalStyles.panel_row}>
+          <View style={globalStyles.panel_item}>
+            <Text style={globalStyles.panel_value}>
               {formatDistance(activity.distance)}
             </Text>
-            <Text style={styles.metricLabel}>Distance</Text>
+            <Text style={globalStyles.panel_label}>Distance</Text>
           </View>
-          <View style={styles.metric}>
-            <Text style={styles.metricValue}>
+          <View style={globalStyles.panel_item  }>
+            <Text style={globalStyles.panel_value}>
               {formatDuration(activity.duration)}
             </Text>
-            <Text style={styles.metricLabel}>Durée</Text>
+            <Text style={globalStyles.panel_label }>Durée</Text>
           </View>
-          <View style={styles.metric}>
-            <Text style={styles.metricValue}>
+          <View style={globalStyles.panel_item}>
+            <Text style={globalStyles.panel_value}>
               {msToKmh(activity.averageSpeed).toFixed(1)} km/h
             </Text>
-            <Text style={styles.metricLabel}>Vitesse moy.</Text>
+            <Text style={globalStyles.panel_label}>Vitesse moy.</Text>
           </View>
         </View>
       </View>
@@ -129,53 +168,3 @@ export default function ActivityDetailScreen({ activityId, userId }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.background,
-  },
-  map: {
-    height: 250,
-    width: '100%',
-  },
-  details: {
-    backgroundColor: COLORS.surface,
-    margin: SPACING.lg,
-    padding: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-  },
-  type: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: 'bold',
-    color: COLORS.text,
-  },
-  date: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.md,
-  },
-  metrics: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  metric: {
-    alignItems: 'center',
-  },
-  metricValue: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-  },
-  metricLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-  },
-});

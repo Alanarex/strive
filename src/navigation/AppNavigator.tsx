@@ -6,7 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import { /* Text removed - use icons instead */ } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
@@ -28,7 +29,7 @@ function HomeStack() {
   if (!user) return null;
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="HomeList">
+      <Stack.Screen name="Acceuil">
         {({ navigation }) => (
           <HomeScreen
             userId={user.id}
@@ -56,7 +57,15 @@ function HomeStack() {
           />
         )}
       </Stack.Screen>
-      <Stack.Screen name="Recording">
+      <Stack.Screen
+        name="Recording"
+        options={{
+          headerShown: true,
+          headerTitle: 'Enregistrement',
+          headerStyle: { backgroundColor: COLORS.background },
+          headerTintColor: COLORS.text,
+        }}
+      >
         {({ navigation }) => (
           <RecordingScreen userId={user.id} onStop={() => navigation.goBack()} />
         )}
@@ -84,11 +93,21 @@ function MainTabs() {
       <Tab.Screen
         name="HomeTab"
         component={HomeStack}
-        options={{ title: 'Accueil', tabBarIcon: () => <Text>🏠</Text> }}
+        options={{
+          title: 'Accueil',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={size ?? 20} color={color} />
+          ),
+        }}
       />
       <Tab.Screen
         name="ProfileTab"
-        options={{ title: 'Profil', tabBarIcon: () => <Text>👤</Text> }}
+        options={{
+          title: 'Profil',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="person" size={size ?? 20} color={color} />
+          ),
+        }}
       >
         {() => (
           <ProfileScreen

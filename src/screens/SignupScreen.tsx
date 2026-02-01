@@ -8,12 +8,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Alert,
   ScrollView,
 } from 'react-native';
+import globalStyles from '../constants/globalStyles';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 
@@ -52,131 +52,73 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top","bottom"]}>
+    <SafeAreaView style={globalStyles.container} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
-        style={styles.container}
+        style={globalStyles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[globalStyles.scrollable_container]}
           keyboardShouldPersistTaps="handled"
         >
-        <Text style={styles.title}>Créer un compte</Text>
-        <Text style={styles.subtitle}>Rejoignez Strive pour suivre vos activités</Text>
-        <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nom"
-            placeholderTextColor={COLORS.textMuted}
-            value={name}
-            onChangeText={setName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={COLORS.textMuted}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Mot de passe (min. 6 caractères)"
-            placeholderTextColor={COLORS.textMuted}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirmer le mot de passe"
-            placeholderTextColor={COLORS.textMuted}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleSignup}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? 'Création...' : 'Créer mon compte'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={onNavigateToLogin}
-          >
-            <Text style={styles.linkText}>
-              Déjà un compte ? Se connecter
-            </Text>
-          </TouchableOpacity>
-        </View>
+          <Text style={globalStyles.big_title}>Créer un compte</Text>
+          <Text style={[globalStyles.card_text, { textAlign: 'center', marginBottom: SPACING.md }]}>Rejoignez Strive pour suivre vos activités</Text>
+          <View style={globalStyles.flex_column}>
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Nom"
+              placeholderTextColor={COLORS.textMuted}
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Email"
+              placeholderTextColor={COLORS.textMuted}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Mot de passe (min. 6 caractères)"
+              placeholderTextColor={COLORS.textMuted}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Confirmer le mot de passe"
+              placeholderTextColor={COLORS.textMuted}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+            <TouchableOpacity
+              style={[globalStyles.btn, globalStyles.btn_primary, loading && globalStyles.btn_disabled]}
+              onPress={handleSignup}
+              disabled={loading}
+            >
+              <Text style={globalStyles.btn_primary_text}>
+                {loading ? 'Création...' : 'Créer mon compte'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={globalStyles.link_button}
+              onPress={onNavigateToLogin}
+            >
+              <Text style={globalStyles.link_text}>
+                Déjà un compte ? Se connecter
+              </Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: SPACING.lg,
-    paddingVertical: SPACING.xl * 2,
-  },
-  title: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: 'bold',
-    color: COLORS.primary,
-    textAlign: 'center',
-    marginBottom: SPACING.xs,
-  },
-  subtitle: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.xl,
-  },
-  form: {
-    gap: SPACING.md,
-  },
-  input: {
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  button: {
-    backgroundColor: COLORS.primary,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: COLORS.background,
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
-  },
-  linkButton: {
-    padding: SPACING.md,
-    alignItems: 'center',
-  },
-  linkText: {
-    color: COLORS.secondary,
-    fontSize: FONT_SIZES.md,
-  },
-});
+
