@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import globalStyles from '../constants/globalStyles';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { COLORS } from '../constants/theme';
 
 interface Props {
   onLogin: (email: string, password: string) => Promise<boolean>;

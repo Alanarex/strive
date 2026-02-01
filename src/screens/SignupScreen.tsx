@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import globalStyles from '../constants/globalStyles';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { COLORS } from '../constants/theme';
 
 interface Props {
   onSignup: (name: string, email: string, password: string) => Promise<boolean>;
@@ -62,7 +62,7 @@ export default function SignupScreen({ onSignup, onNavigateToLogin }: Props) {
           keyboardShouldPersistTaps="handled"
         >
           <Text style={globalStyles.big_title}>Créer un compte</Text>
-          <Text style={[globalStyles.card_text, { textAlign: 'center', marginBottom: SPACING.md }]}>Rejoignez Strive pour suivre vos activités</Text>
+          <Text style={[globalStyles.card_text, { textAlign: 'center', marginBottom: 12 }]}>Rejoignez Strive pour suivre vos activités</Text>
           <View style={globalStyles.flex_column}>
             <TextInput
               style={globalStyles.input}

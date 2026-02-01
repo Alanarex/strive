@@ -16,7 +16,7 @@ import globalStyles from '../constants/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Updates from 'expo-updates';
 import { DevSettings } from 'react-native';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { COLORS, SPACING } from '../constants/theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {

@@ -3,15 +3,23 @@
  */
 
 import * as SQLite from 'expo-sqlite';
+import { generateSampleActivities } from '../utils/sampleData';
 import type { User, Activity, GPSPoint } from '../types';
 
 const DB_NAME = 'strive.db';
 
 let db: SQLite.SQLiteDatabase | null = null;
+let isInitialized = false;
 
 export async function initDatabase(): Promise<void> {
   if (db) return;
   db = await SQLite.openDatabaseAsync(DB_NAME);
+
+  // Check if this is a new database by checking if tables exist
+  const tablesResult = await db.getFirstAsync(`
+    SELECT name FROM sqlite_master WHERE type='table' AND name='activities';
+  `);
+  const isNewDatabase = !tablesResult;
 
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
@@ -38,6 +46,23 @@ export async function initDatabase(): Promise<void> {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `);
+
+  // Generate sample activities for new database
+  if (isNewDatabase && !isInitialized) {
+    try {
+      // Create a default user for sample activities
+      const defaultUserId = 'default-user';
+      await createUser(defaultUserId, 'Demo User', 'demo@example.com', 'demo-hash');
+      
+      // Generate sample activities
+      await generateSampleActivities(defaultUserId);
+      console.log('Generated sample activities for new database');
+    } catch (error) {
+      console.warn('Failed to generate sample activities:', error);
+    }
+  }
+  
+  isInitialized = true;
 }
 
 export async function createUser(
