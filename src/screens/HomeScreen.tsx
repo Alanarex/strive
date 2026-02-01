@@ -29,11 +29,12 @@ import {
   formatDuration,
   msToKmh,
 } from '../utils/gps';
-import { Alert, ActivityIndicator, StyleSheet } from 'react-native';
+import { Alert, ActivityIndicator } from 'react-native';
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 import type { ActivitySummary, GlobalStats } from '../types';
+import { useRecording } from '../context/RecordingContext';
 
 const ACTIVITY_LABELS: Record<string, string> = {
   run: 'Course',
@@ -54,6 +55,7 @@ export default function HomeScreen({
   onNavigateToDetail,
   onNavigateToRecord,
 }: Props) {
+  const { state: recordingState, activityType } = useRecording();
   const insets = useSafeAreaInsets();
   const [hasForegroundPerm, setHasForegroundPerm] = useState<boolean | null>(null);
   const [hasBackgroundPerm, setHasBackgroundPerm] = useState<boolean | null>(null);
@@ -61,6 +63,7 @@ export default function HomeScreen({
   const [dismissedPermissions, setDismissedPermissions] = useState<string[]>([]);
   const scrollRef = useRef<ScrollView | null>(null);
   const anim = useRef(new Animated.Value(1)).current;
+  const flashAnim = useRef(new Animated.Value(1)).current;
   const screenW = Dimensions.get('window').width;
   const [activities, setActivities] = useState<ActivitySummary[]>([]);
   const [stats, setStats] = useState<GlobalStats>({
@@ -134,6 +137,28 @@ export default function HomeScreen({
     checkPermissions();
   }, [checkPermissions]);
 
+  // Flashing animation for recording badge
+  useEffect(() => {
+    if (recordingState === 'recording' || recordingState === 'paused') {
+      const animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(flashAnim, {
+            toValue: 0.2,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(flashAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      animation.start();
+      return () => animation.stop();
+    }
+  }, [recordingState, flashAnim]);
+
   const openSettings = () => {
     Linking.openSettings();
   };
@@ -204,7 +229,7 @@ export default function HomeScreen({
   };
 
   const renderRightActions = (id: string) => (
-    <RectButton style={globalStyles.deleteButton} onPress={() => handleDelete(id)}>
+    <RectButton style={globalStyles.delete_button} onPress={() => handleDelete(id)}>
       <MaterialIcons name="delete" size={22} color={COLORS.text} accessibilityLabel="Supprimer" />
     </RectButton>
   );
@@ -329,9 +354,22 @@ export default function HomeScreen({
         </Text>
       </View>
 
-      <TouchableOpacity style={[globalStyles.btn, globalStyles.btn_primary]} onPress={onNavigateToRecord}>
-        <Text style={globalStyles.btn_primary_text}>+ Nouvelle activité</Text>
-      </TouchableOpacity>
+      {recordingState === 'recording' || recordingState === 'paused' ? (
+        <TouchableOpacity style={[globalStyles.btn, globalStyles.btn_flashing]} onPress={onNavigateToRecord}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Animated.View
+              style={[globalStyles.status_dot, globalStyles.status_dot_primary, { opacity: flashAnim }]}
+            />
+            <Text style={globalStyles.btn_flashing_text}>
+              {ACTIVITY_LABELS[activityType] ?? activityType} en cours
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={[globalStyles.btn, globalStyles.btn_primary]} onPress={onNavigateToRecord}>
+          <Text style={globalStyles.btn_primary_text}>+ Nouvelle activité</Text>
+        </TouchableOpacity>
+      )}
 
       <FlatList
         data={activities}

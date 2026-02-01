@@ -2,7 +2,9 @@ import { StyleSheet } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from './theme';
 
 export default StyleSheet.create({
-
+    // ========================================
+    // LAYOUT & CONTAINERS
+    // ========================================
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
@@ -12,6 +14,23 @@ export default StyleSheet.create({
         padding: SPACING.md,
     },
 
+    scrollable_container: {
+        justifyContent: 'center',
+        flex: 1,
+        backgroundColor: COLORS.background,
+        padding: SPACING.md,
+    },
+
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.background,
+    },
+
+    // ========================================
+    // FLEXBOX UTILITIES
+    // ========================================
     flex_row: {
         flexDirection: 'row',
         gap: SPACING.md,
@@ -22,6 +41,19 @@ export default StyleSheet.create({
         gap: SPACING.md,
     },
 
+    fill: {
+        flex: 1,
+    },
+
+    separator: {
+        width: 1,
+        height: '100%',
+        backgroundColor: COLORS.border,
+    },
+
+    // ========================================
+    // CARD & SURFACE STYLES
+    // ========================================
     card: {
         backgroundColor: COLORS.surface,
         borderRadius: BORDER_RADIUS.lg,
@@ -29,11 +61,6 @@ export default StyleSheet.create({
         gap: SPACING.md,
         width: '100%',
         height: 'auto',
-    },
-
-    panel_row: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
     },
 
     card_title: {
@@ -48,25 +75,38 @@ export default StyleSheet.create({
         color: COLORS.textSecondary,
     },
 
+    // ========================================
+    // TYPOGRAPHY & TEXT STYLES
+    // ========================================
     title: {
         fontSize: FONT_SIZES.xl,
         fontWeight: 'bold',
         color: COLORS.text,
     },
 
-    scrollable_container: {
-        justifyContent: 'center',
-        flex: 1,
-        backgroundColor: COLORS.background,
-        padding: SPACING.md,
+    big_title: {
+        fontSize: FONT_SIZES.xxl,
+        fontWeight: 'bold',
+        color: COLORS.primary,
+        textAlign: 'center',
+        marginBottom: SPACING.xs,
     },
 
-    pagination_dots: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginTop: SPACING.sm
+    date: {
+        fontSize: FONT_SIZES.md,
+        color: COLORS.textSecondary,
+        marginTop: SPACING.xs,
+        marginBottom: SPACING.md,
     },
 
+    link_text: {
+        color: COLORS.secondary,
+        fontSize: FONT_SIZES.md,
+    },
+
+    // ========================================
+    // BUTTON STYLES
+    // ========================================
     btn: {
         height: 50,
         width: 'auto',
@@ -77,7 +117,9 @@ export default StyleSheet.create({
         alignSelf: 'stretch',
     },
 
-    btn_disabled: { opacity: 0.6 },
+    btn_disabled: {
+        opacity: 0.6,
+    },
 
     btn_primary: {
         backgroundColor: COLORS.primary,
@@ -121,10 +163,36 @@ export default StyleSheet.create({
         fontSize: FONT_SIZES.md,
     },
 
-    fill: {
-        flex: 1,
+    link_button: {
+        padding: SPACING.md,
+        alignItems: 'center',
     },
 
+    delete_button: {
+        backgroundColor: COLORS.error,
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        width: 'auto',
+        paddingHorizontal: SPACING.lg,
+        borderRadius: BORDER_RADIUS.lg,
+    },
+
+    btn_flashing: {
+        borderRadius: BORDER_RADIUS.full,
+        backgroundColor: COLORS.surface,
+        borderWidth: 1,
+        borderColor: COLORS.primary,
+    },
+
+    btn_flashing_text: {
+        fontSize: FONT_SIZES.lg,
+        fontWeight: '600',
+        color: COLORS.primary,
+    },
+
+    // ========================================
+    // INPUT STYLES
+    // ========================================
     input: {
         width: '100%',
         height: 44,
@@ -137,14 +205,19 @@ export default StyleSheet.create({
         borderColor: COLORS.border,
     },
 
+    // ========================================
+    // LIST STYLES
+    // ========================================
     list: {
         flexDirection: 'column',
     },
+
     list_item: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         marginTop: SPACING.xs,
     },
+
     list_bullet: {
         width: 8,
         height: 8,
@@ -153,10 +226,24 @@ export default StyleSheet.create({
         marginRight: SPACING.sm,
         marginVertical: 'auto',
     },
+
     list_text: {
         color: COLORS.textSecondary,
         fontSize: FONT_SIZES.sm,
         flex: 1,
+    },
+
+    list_content: {
+        padding: SPACING.lg,
+        paddingTop: 0,
+    },
+
+    // ========================================
+    // PANEL & GRID STYLES
+    // ========================================
+    panel_row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
     },
 
     panel_item: {
@@ -169,6 +256,7 @@ export default StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.primary,
     },
+
     panel_value_large: {
         fontSize: FONT_SIZES.xl,
         fontWeight: 'bold',
@@ -182,17 +270,9 @@ export default StyleSheet.create({
         marginTop: SPACING.xs,
     },
 
-    separator: {
-        width: 1,
-        height: '100%',
-        backgroundColor: COLORS.border,
-    },
-
-    list_content: {
-        padding: SPACING.lg,
-        paddingTop: 0,
-    },
-
+    // ========================================
+    // BADGE & STATUS STYLES
+    // ========================================
     status_badge: {
         padding: SPACING.sm,
         width: 'auto',
@@ -203,8 +283,13 @@ export default StyleSheet.create({
         borderColor: COLORS.border,
     },
 
-    badge_primary: { borderColor: COLORS.primary },
-    badge_warning: { borderColor: COLORS.warning },
+    badge_primary: {
+        borderColor: COLORS.primary,
+    },
+
+    badge_warning: {
+        borderColor: COLORS.warning,
+    },
 
     status_dot: {
         width: 12,
@@ -212,21 +297,24 @@ export default StyleSheet.create({
         borderRadius: 12,
         backgroundColor: COLORS.primary,
         marginRight: 8,
-        // Animated transform/opacity must be applied from components, not in static styles
         borderWidth: 1,
         borderColor: COLORS.border,
+        // Note: Animated transform/opacity must be applied from components, not in static styles
     },
 
     status_dot_primary: {
         borderColor: COLORS.primary,
         backgroundColor: COLORS.primary,
-
     },
+
     status_dot_warning: {
         borderColor: COLORS.warning,
         backgroundColor: COLORS.warning,
     },
 
+    // ========================================
+    // BANNER & ALERT STYLES
+    // ========================================
     warning_banner: {
         position: 'absolute',
         left: 12,
@@ -243,13 +331,36 @@ export default StyleSheet.create({
         fontWeight: '600',
     },
 
-    /* Activity detail screen */
-    centered: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: COLORS.background,
+    // ========================================
+    // TAG & CHIP STYLES
+    // ========================================
+    tags_container: {
+        gap: SPACING.sm,
     },
+
+    tag_chip: {
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        borderRadius: BORDER_RADIUS.full,
+        backgroundColor: COLORS.surfaceLight,
+    },
+
+    tag_chip_active: {
+        backgroundColor: COLORS.primary,
+    },
+
+    tag_chip_text: {
+        color: COLORS.textSecondary,
+    },
+
+    tag_chip_text_active: {
+        color: COLORS.background,
+        fontWeight: '600',
+    },
+
+    // ========================================
+    // MAP & LOCATION STYLES
+    // ========================================
     map: {
         borderRadius: BORDER_RADIUS.md,
         height: 'auto',
@@ -257,53 +368,13 @@ export default StyleSheet.create({
         flex: 1,
     },
 
-
-    date: {
-        fontSize: FONT_SIZES.md,
-        color: COLORS.textSecondary,
-        marginTop: SPACING.xs,
-        marginBottom: SPACING.md,
-    },
-
-    big_title: {
-        fontSize: FONT_SIZES.xxl,
-        fontWeight: 'bold',
-        color: COLORS.primary,
-        textAlign: 'center',
-        marginBottom: SPACING.xs,
-    },
-
-    link_button: { padding: SPACING.md, alignItems: 'center' },
-    link_text: { color: COLORS.secondary, fontSize: FONT_SIZES.md },
-
-    tags_container: { gap: SPACING.sm },
-    tag_chip: {
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
-        borderRadius: BORDER_RADIUS.full,
-        backgroundColor: COLORS.surfaceLight,
-    },
-    tag_chip_active: { backgroundColor: COLORS.primary },
-    tag_chip_text: { color: COLORS.textSecondary },
-    tag_chip_text_active: { color: COLORS.background, fontWeight: '600' },
-   
-    deleteButton: {
-        backgroundColor: COLORS.error,
+    // ========================================
+    // PAGINATION STYLES
+    // ========================================
+    pagination_dots: {
+        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'flex-end',
-        width: 'auto',
-        paddingHorizontal: SPACING.lg,
-        borderRadius: BORDER_RADIUS.lg,
-    },
-    deleteButtonText: {
-        color: COLORS.text,
-        fontWeight: '600',
-        paddingHorizontal: SPACING.md,
-    },
-    deleteButtonIcon: {
-        color: COLORS.text,
-        fontSize: 20,
-        paddingVertical: SPACING.sm,
+        marginTop: SPACING.sm,
     },
 });
 
