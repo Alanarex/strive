@@ -91,59 +91,67 @@ function calculateDistance(points: GPSPoint[]): number {
  * Generate and save sample activities
  */
 export async function generateSampleActivities(userId: string): Promise<void> {
-  // Activity 1: Morning run
-  const runDuration = 35 * 60 * 1000; // 35 minutes
-  const runSpeed = 3.5; // m/s (~12.6 km/h)
-  const runPoints = generateGPSRoute(
-    PARIS_CENTER.lat + 0.01,
-    PARIS_CENTER.lng - 0.01,
-    runDuration,
-    runSpeed,
-    'run'
-  );
-  const runDistance = calculateDistance(runPoints);
-  const runStartTime = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
-  
-  const runActivity: Activity = {
-    id: generateId(),
-    userId,
-    type: 'run',
-    gpsPoints: runPoints,
-    distance: runDistance,
-    duration: Math.floor(runDuration / 1000), // Convert to seconds
-    averageSpeed: runDistance / (runDuration / 1000), // m/s
-    startTime: runStartTime,
-    endTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + runDuration).toISOString(),
-    recordingState: 'completed',
-  };
-  
-  await saveActivity(runActivity);
+  const activityConfigs = [
+    {
+      type: 'run' as ActivityType,
+      duration: 35 * 60 * 1000, // 35 minutes
+      speed: 3.5, // m/s (~12.6 km/h)
+      latOffset: 0.01,
+      lngOffset: -0.01,
+      daysAgo: 3,
+    },
+    {
+      type: 'walk' as ActivityType,
+      duration: 50 * 60 * 1000, // 50 minutes
+      speed: 1.4, // m/s (~5 km/h)
+      latOffset: -0.005,
+      lngOffset: 0.005,
+      daysAgo: 2,
+    },
+    {
+      type: 'bike' as ActivityType,
+      duration: 45 * 60 * 1000, // 45 minutes
+      speed: 6.5, // m/s (~23.4 km/h)
+      latOffset: -0.005,
+      lngOffset: 0.02,
+      daysAgo: 1,
+    },
+    {
+      type: 'hike' as ActivityType,
+      duration: 120 * 60 * 1000, // 2 hours
+      speed: 1.2, // m/s (~4.3 km/h)
+      latOffset: 0.015,
+      lngOffset: 0.01,
+      daysAgo: 5,
+    },
+  ];
 
-  // Activity 2: Evening bike ride
-  const bikeDuration = 45 * 60 * 1000; // 45 minutes  
-  const bikeSpeed = 6.5; // m/s (~23.4 km/h)
-  const bikePoints = generateGPSRoute(
-    PARIS_CENTER.lat - 0.005,
-    PARIS_CENTER.lng + 0.02,
-    bikeDuration,
-    bikeSpeed,
-    'bike'
-  );
-  const bikeDistance = calculateDistance(bikePoints);
-  const bikeStartTime = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString();
-  
-  const bikeActivity: Activity = {
-    id: generateId(),
-    userId,
-    type: 'bike',
-    gpsPoints: bikePoints,
-    distance: bikeDistance,
-    duration: Math.floor(bikeDuration / 1000), // Convert to seconds
-    averageSpeed: bikeDistance / (bikeDuration / 1000), // m/s
-    startTime: bikeStartTime,
-    endTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + bikeDuration).toISOString(),
-    recordingState: 'completed',
-  };
-  
-  await saveActivity(bikeActivity);
+  for (const config of activityConfigs) {
+    const gpsPoints = generateGPSRoute(
+      PARIS_CENTER.lat + config.latOffset,
+      PARIS_CENTER.lng + config.lngOffset,
+      config.duration,
+      config.speed,
+      config.type
+    );
+    
+    const distance = calculateDistance(gpsPoints);
+    const startTime = new Date(Date.now() - config.daysAgo * 24 * 60 * 60 * 1000).toISOString();
+    const endTime = new Date(Date.now() - config.daysAgo * 24 * 60 * 60 * 1000 + config.duration).toISOString();
+    
+    const activity: Activity = {
+      id: generateId(),
+      userId,
+      type: config.type,
+      gpsPoints,
+      distance,
+      duration: Math.floor(config.duration / 1000), // Convert to seconds
+      averageSpeed: distance / (config.duration / 1000), // m/s
+      startTime,
+      endTime,
+      recordingState: 'completed',
+    };
+    
+    await saveActivity(activity);
+  }
 }

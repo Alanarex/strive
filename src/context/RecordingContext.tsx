@@ -20,6 +20,12 @@ import {
 import { readBackgroundLocations, clearBackgroundLocations } from '../services/backgroundStore';
 import { saveActivity } from '../services/database';
 import {
+  sendDistanceMilestoneNotification,
+  sendDurationMilestoneNotification,
+  sendActivityCompletedNotification,
+  requestNotificationPermission,
+} from '../services/notificationService';
+import {
   shouldAddPoint,
   calculateTotalDistance,
 } from '../utils/gps';
@@ -62,8 +68,19 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
   const foregroundCleanupRef = useRef<(() => void) | null>(null);
 
   const updateStats = useCallback((points: GPSPoint[]) => {
-    setDistance(calculateTotalDistance(points));
-  }, []);
+    const newDistance = calculateTotalDistance(points);
+    setDistance(newDistance);
+
+    // Check for distance milestone (every 5km)
+    if (
+      state === 'recording' &&
+      newDistance > lastNotifiedDistanceRef.current + 5000
+    ) {
+      lastNotifiedDistanceRef.current =
+        Math.floor(newDistance / 5000) * 5000;
+      sendDistanceMilestoneNotification(newDistance, 5);
+    }
+  }, [state]);
 
   const handleLocation = useCallback(
     (point: GPSPoint) => {
@@ -79,10 +96,23 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
 
   const startTimer = useCallback(() => {
     timerRef.current = setInterval(() => {
-      const elapsed = elapsedBeforePauseRef.current + (Date.now() - startTimeRef.current) / 1000;
-      setDuration(Math.floor(elapsed));
+      const elapsed =
+        elapsedBeforePauseRef.current +
+        (Date.now() - startTimeRef.current) / 1000;
+      const floorElapsed = Math.floor(elapsed);
+      setDuration(floorElapsed);
+
+      // Check for duration milestone (every 30min)
+      if (
+        state === 'recording' &&
+        floorElapsed > lastNotifiedDurationRef.current + 1800
+      ) {
+        lastNotifiedDurationRef.current =
+          Math.floor(floorElapsed / 1800) * 1800;
+        sendDurationMilestoneNotification(floorElapsed, 30);
+      }
     }, 1000);
-  }, []);
+  }, [state]);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -183,6 +213,8 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
 
   const gpsPointsRef = useRef<GPSPoint[]>([]);
   const durationRef = useRef(0);
+  const lastNotifiedDistanceRef = useRef(0);
+  const lastNotifiedDurationRef = useRef(0);
   gpsPointsRef.current = gpsPoints;
   durationRef.current = duration;
 
@@ -201,6 +233,7 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
 
   const stopAndSaveRecording = useCallback(
     async (userId: string): Promise<Activity | null> => {
+      await requestNotificationPermission();
       stopTimer();
       await stopBackgroundLocationUpdates();
       if (foregroundCleanupRef.current) {
@@ -214,7 +247,8 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
       const dist = calculateTotalDistance(points);
       const startTs = points[0].timestamp;
       const endTs = points[points.length - 1].timestamp;
-      const dur = Math.floor((endTs - startTs) / 1000) || Math.floor(durationRef.current);
+      const dur =
+        Math.floor((endTs - startTs) / 1000) || Math.floor(durationRef.current);
       const avgSpeed = dur > 0 ? dist / dur : 0;
 
       const activity: Activity = {
@@ -230,9 +264,12 @@ export function RecordingProvider({ children }: { children: React.ReactNode }) {
         recordingState: 'completed',
       };
       await saveActivity(activity);
+      await sendActivityCompletedNotification(activityType, dist, dur);
       setGpsPoints([]);
       setDistance(0);
       setDuration(0);
+      lastNotifiedDistanceRef.current = 0;
+      lastNotifiedDurationRef.current = 0;
       return activity;
     },
     [activityType, stopTimer]

@@ -15,9 +15,8 @@ export default StyleSheet.create({
     },
 
     scrollable_container: {
-        justifyContent: 'center',
-        flex: 1,
         backgroundColor: COLORS.background,
+        gap: SPACING.md,
         padding: SPACING.md,
     },
 
@@ -36,6 +35,13 @@ export default StyleSheet.create({
         gap: SPACING.md,
     },
 
+    flex_row_wrap: {
+        flexDirection: 'row',
+        gap: SPACING.md,
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+
     flex_column: {
         flexDirection: 'column',
         gap: SPACING.md,
@@ -43,6 +49,14 @@ export default StyleSheet.create({
 
     fill: {
         flex: 1,
+    },
+
+    stat_item_half: {
+        width: '48%',
+    },
+
+    section_spacing: {
+        marginTop: SPACING.lg,
     },
 
     separator: {
@@ -56,6 +70,15 @@ export default StyleSheet.create({
     // ========================================
     card: {
         backgroundColor: COLORS.surface,
+        borderRadius: BORDER_RADIUS.lg,
+        padding: SPACING.md,
+        gap: SPACING.md,
+        width: '100%',
+        height: 'auto',
+    },
+
+    card_transparent: {
+        backgroundColor: 'transparent',
         borderRadius: BORDER_RADIUS.lg,
         padding: SPACING.md,
         gap: SPACING.md,
@@ -82,6 +105,14 @@ export default StyleSheet.create({
         fontSize: FONT_SIZES.xl,
         fontWeight: 'bold',
         color: COLORS.text,
+    },
+
+    title_centered: {
+        fontSize: FONT_SIZES.xl,
+        fontWeight: 'bold',
+        color: COLORS.text,
+        textAlign: 'center',
+        marginBottom: SPACING.lg,
     },
 
     big_title: {
@@ -251,8 +282,74 @@ export default StyleSheet.create({
         flex: 1,
     },
 
+
+    // ========================================
+    // ACHIEVEMENT STYLES
+    // ========================================
+    achievements_container: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: SPACING.md,
+        justifyContent: 'space-between',
+    },
+
+    achievement_card: {
+        width: '50%',
+        backgroundColor: COLORS.surfaceLight,
+        borderRadius: 12,
+        paddingVertical: SPACING.sm,
+        paddingLeft: SPACING.xs,
+        borderLeftWidth: 4,
+        borderLeftColor: COLORS.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    achievement_header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: SPACING.sm,
+    },
+
+    achievement_icon: {
+        fontSize: 32,
+        marginRight: SPACING.xs,
+    },
+
+    achievement_content: {
+        flex: 1,
+        gap: SPACING.xs,
+    },
+
+    achievement_title: {
+        fontSize: FONT_SIZES.xs,
+        color: COLORS.textMuted,
+    },
+
+    achievement_value: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.primary,
+    },
+
+    achievement_description: {
+        fontSize: FONT_SIZES.xs,
+        color: COLORS.textMuted,
+    },
+    chart_container: {
+        width: '100%',
+        marginTop: SPACING.md,
+    },
+
+    chart_filters_row: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: SPACING.sm,
+        marginTop: SPACING.sm,
+    },
     panel_value: {
-        fontSize: FONT_SIZES.lg,
+        fontSize: FONT_SIZES.md,
         fontWeight: 'bold',
         color: COLORS.primary,
     },
@@ -334,15 +431,27 @@ export default StyleSheet.create({
     // ========================================
     // TAG & CHIP STYLES
     // ========================================
+    tags_scrollview: {
+        height: 'auto',
+        flexGrow: 0,
+        borderRadius: BORDER_RADIUS.lg,
+        alignSelf: 'stretch',
+        paddingVertical: SPACING.sm,
+    },
+
     tags_container: {
         gap: SPACING.sm,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 
     tag_chip: {
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.sm,
+        paddingVertical: SPACING.xs,
         borderRadius: BORDER_RADIUS.full,
         backgroundColor: COLORS.surfaceLight,
+        height: 32,
+        justifyContent: 'center',
     },
 
     tag_chip_active: {

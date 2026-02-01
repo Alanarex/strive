@@ -17,6 +17,7 @@ import HomeScreen from '../screens/HomeScreen';
 import RecordingScreen from '../screens/RecordingScreen';
 import ActivityDetailScreen from '../screens/ActivityDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import LeaderboardScreen from '../screens/LeaderboardScreen';
 import { COLORS, FONT_SIZES } from '../constants/theme';
 
 const WELCOME_KEY = 'strive_welcome_seen';
@@ -101,6 +102,19 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
+        name="LeaderboardTab"
+        options={{
+          title: 'Stats',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="bar-chart" size={size ?? 20} color={color} />
+          ),
+        }}
+      >
+        {() => (
+          <LeaderboardScreen userId={user.id} />
+        )}
+      </Tab.Screen>
+      <Tab.Screen
         name="ProfileTab"
         options={{
           title: 'Profil',
@@ -113,6 +127,7 @@ function MainTabs() {
           <ProfileScreen
             userName={user.name}
             userEmail={user.email}
+            userPhoto={user.photo}
             onUpdateProfile={updateProfile}
             onLogout={logout}
           />

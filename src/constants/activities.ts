@@ -9,7 +9,6 @@ export const ACTIVITY_LABELS: Record<string, string> = {
   walk: 'Marche',
   bike: 'Vélo',
   hike: 'Randonnée',
-  other: 'Autre',
 };
 
 export const ACTIVITY_TYPES: Array<{ key: ActivityType; label: string }> = [
@@ -17,5 +16,4 @@ export const ACTIVITY_TYPES: Array<{ key: ActivityType; label: string }> = [
   { key: 'walk', label: 'Marche' },
   { key: 'bike', label: 'Vélo' },
   { key: 'hike', label: 'Randonnée' },
-  { key: 'other', label: 'Autre' },
 ];

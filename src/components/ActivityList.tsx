@@ -97,7 +97,7 @@ export default function ActivityList({
       keyExtractor={(item) => item.id}
       contentContainerStyle={[
         globalStyles.list,
-        { paddingBottom: (globalStyles.list_content.padding || 0) + insets.bottom + 8 },
+        { paddingBottom: (typeof globalStyles.list_content.padding === 'number' ? globalStyles.list_content.padding : 24) + insets.bottom + 8 },
       ]}
       ItemSeparatorComponent={() => <View style={{ height: SPACING.md }} />}
       refreshControl={

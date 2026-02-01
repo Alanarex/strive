@@ -24,7 +24,7 @@ interface Props {
 export default function StatPanel({ items, withCard = true, style }: Props) {
   // Check if any items have labels
   const hasLabels = items.some(item => item.label && item.label.trim() !== '');
-  
+
   const renderContent = () => {
     if (items.length === 1) {
       // Single item layout (like average speed)

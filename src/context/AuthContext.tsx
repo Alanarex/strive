@@ -16,6 +16,7 @@ import {
   getUserById,
   updateUser,
 } from '../services/database';
+import { simpleHash } from '../utils/auth';
 import type { User } from '../types';
 
 const SESSION_KEY = 'strive_session_user_id';
@@ -35,17 +36,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
-// Hash simple pour le mot de passe (pour un MVP local)
-function simpleHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return hash.toString(36);
-}
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);

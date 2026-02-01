@@ -4,12 +4,27 @@
 
 import * as SQLite from 'expo-sqlite';
 import { generateSampleActivities } from '../utils/sampleData';
+import { simpleHash } from '../utils/auth';
 import type { User, Activity, GPSPoint } from '../types';
 
 const DB_NAME = 'strive.db';
 
 let db: SQLite.SQLiteDatabase | null = null;
 let isInitialized = false;
+
+export async function resetDatabaseWithDemo(): Promise<void> {
+  try {
+    if (db && 'closeAsync' in db && typeof db.closeAsync === 'function') {
+      await db.closeAsync();
+    }
+  } catch {
+    // ignore close errors
+  }
+  db = null;
+  isInitialized = false;
+  await SQLite.deleteDatabaseAsync(DB_NAME);
+  await initDatabase();
+}
 
 export async function initDatabase(): Promise<void> {
   if (db) return;
@@ -52,7 +67,12 @@ export async function initDatabase(): Promise<void> {
     try {
       // Create a default user for sample activities
       const defaultUserId = 'default-user';
-      await createUser(defaultUserId, 'Demo User', 'demo@example.com', 'demo-hash');
+      await createUser(
+        defaultUserId,
+        'Demo User',
+        'demo@strive.com',
+        simpleHash('demo')
+      );
       
       // Generate sample activities
       await generateSampleActivities(defaultUserId);

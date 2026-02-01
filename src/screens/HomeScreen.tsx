@@ -11,9 +11,9 @@ import {
 import globalStyles from '../constants/globalStyles';
 import { getActivitiesByUserId } from '../services/database';
 import { formatDistance, formatDuration, msToKmh } from '../utils/gps';
-import { PermissionSection, ActivityList, RecordingBadge, StatPanel } from '../components';
+import { PermissionSection, ActivityList, RecordingBadge, StatPanel, ActivityTypeSelector } from '../components';
 import { useRecording } from '../context/RecordingContext';
-import type { ActivitySummary, GlobalStats } from '../types';
+import type { ActivitySummary, GlobalStats, ActivityType } from '../types';
 interface Props {
   userId: string;
   onNavigateToRecord: () => void;
@@ -26,6 +26,7 @@ export default function HomeScreen({
 }: Props) {
   const { state: recordingState } = useRecording();
   const [activities, setActivities] = useState<ActivitySummary[]>([]);
+  const [selectedActivityType, setSelectedActivityType] = useState<ActivityType | 'all'>('all');
   const [stats, setStats] = useState<GlobalStats>({
     totalDistance: 0,
     totalDuration: 0,
@@ -64,6 +65,10 @@ export default function HomeScreen({
     await loadData();
     setRefreshing(false);
   };
+
+  const filteredActivities = selectedActivityType === 'all'
+    ? activities
+    : activities.filter((a) => a.type === selectedActivityType);
   return (
     <SafeAreaView style={globalStyles.container}>
       <PermissionSection />
@@ -74,7 +79,7 @@ export default function HomeScreen({
         { value: stats.totalActivities.toString(), label: 'Activités' }
       ]} />
       <StatPanel items={[
-        { 
+        {
           value: stats.averageSpeed > 0 ? `${msToKmh(stats.averageSpeed).toFixed(1)} km/h` : '-',
           label: 'Vitesse moyenne globale',
           isLarge: true
@@ -86,8 +91,15 @@ export default function HomeScreen({
           <Text style={globalStyles.btn_primary_text}>+ Nouvelle activité</Text>
         </TouchableOpacity>
       )}
+
+      <ActivityTypeSelector
+        selectedType={selectedActivityType}
+        onSelectType={setSelectedActivityType}
+        showAllOption={true}
+      />
+
       <ActivityList
-        activities={activities}
+        activities={filteredActivities}
         userId={userId}
         refreshing={refreshing}
         onRefresh={onRefresh}

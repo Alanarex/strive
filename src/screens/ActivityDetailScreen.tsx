@@ -8,11 +8,11 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import globalStyles from '../constants/globalStyles';
 import { getActivityById } from '../services/database';
-import { formatDistance, formatDuration, msToKmh } from '../utils/gps';
+import { formatDistance, formatDuration, msToKmh, msToPace } from '../utils/gps';
 import { formatActivityDetailDate } from '../utils/formatters';
 import { ACTIVITY_LABELS } from '../constants/activities';
 import { useLocation, useMapRegion } from '../hooks';
-import { StatPanel, ActivityMap } from '../components';
+import { StatPanel, ActivityMap, ExportActivity } from '../components';
 
 interface Props {
   activityId: string;
@@ -73,10 +73,13 @@ export default function ActivityDetailScreen({ activityId, userId }: Props) {
           items={[
             { value: formatDistance(activity.distance), label: 'Distance' },
             { value: formatDuration(activity.duration), label: 'Durée' },
-            { value: `${msToKmh(activity.averageSpeed).toFixed(1)} km/h`, label: 'Vitesse moy.' }
+            { value: `${msToKmh(activity.averageSpeed).toFixed(1)} km/h`, label: 'Vitesse moy.' },
+            { value: msToPace(activity.averageSpeed), label: 'Allure moy.' }
           ]}
           withCard={false}
         />
+
+        <ExportActivity activity={activity} />
       </View>
     </SafeAreaView>
   );

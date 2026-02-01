@@ -14,10 +14,9 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import MapView from 'react-native-maps';
 import globalStyles from '../constants/globalStyles';
 import { useRecording } from '../context/RecordingContext';
-import { formatDistance, formatDuration, msToKmh } from '../utils/gps';
-import { ACTIVITY_TYPES } from '../constants/activities';
+import { formatDistance, formatDuration, msToKmh, msToPace } from '../utils/gps';
 import { useLocation, useMapRegion } from '../hooks';
-import { RecordingStatusBadge, StatPanel, ActivityMap } from '../components';
+import { RecordingStatusBadge, StatPanel, ActivityMap, ActivityTypeSelector } from '../components';
 
 interface Props {
   userId: string;
@@ -123,38 +122,22 @@ export default function RecordingScreen({ userId, onStop }: Props) {
           items={[
             { value: formatDuration(duration), label: 'Durée' },
             { value: formatDistance(distance), label: 'Distance' },
-            { value: duration > 0 ? `${msToKmh(averageSpeed).toFixed(1)} km/h` : '-', label: 'Vitesse' }
+            { value: duration > 0 ? `${msToKmh(averageSpeed).toFixed(1)} km/h` : '-', label: 'Vitesse' },
+            { value: duration > 0 ? msToPace(averageSpeed) : '--:--', label: 'Allure' }
           ]}
           withCard={false}
         />
 
-        {state === 'idle' && !started ? (
-          <ScrollView
-            horizontal
-            contentContainerStyle={globalStyles.tags_container}
-            showsHorizontalScrollIndicator={false}
-          >
-            {ACTIVITY_TYPES.map((t) => (
-              <TouchableOpacity
-                key={t.key}
-                style={[
-                  globalStyles.tag_chip,
-                  activityType === t.key && globalStyles.tag_chip_active,
-                ]}
-                onPress={() => setActivityType(t.key)}
-              >
-                <Text
-                  style={[
-                    globalStyles.tag_chip_text,
-                    activityType === t.key && globalStyles.tag_chip_text_active,
-                  ]}
-                >
-                  {t.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        ) : null}
+        <ActivityTypeSelector
+          selectedType={activityType}
+          onSelectType={(type) => {
+            if (type !== 'all') {
+              setActivityType(type);
+            }
+          }}
+          showAllOption={false}
+          editable={state === 'idle' && !started}
+        />
 
         <View style={[globalStyles.flex_row, { justifyContent: 'center' }]}>
           {state === 'idle' && !started && (
