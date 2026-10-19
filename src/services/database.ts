@@ -4,7 +4,7 @@
 
 import * as SQLite from 'expo-sqlite';
 import { generateSampleActivities } from '../utils/sampleData';
-import { simpleHash } from '../utils/auth';
+import { DISABLED_PASSWORD_HASH } from '../utils/auth';
 import type { User, Activity, GPSPoint } from '../types';
 
 const DB_NAME = 'strive.db';
@@ -71,7 +71,7 @@ export async function initDatabase(): Promise<void> {
         defaultUserId,
         'Demo User',
         'demo@strive.com',
-        simpleHash('demo')
+        DISABLED_PASSWORD_HASH
       );
       
       // Generate sample activities
@@ -146,6 +146,12 @@ export async function getUserById(id: string): Promise<User | null> {
     photo: row.photo ?? undefined,
     createdAt: row.created_at,
   };
+}
+
+export async function updatePasswordHash(id: string, passwordHash: string): Promise<void> {
+  await initDatabase();
+  if (!db) throw new Error('Database not initialized');
+  await db.runAsync(`UPDATE users SET password_hash = ? WHERE id = ?`, [passwordHash, id]);
 }
 
 export async function updateUser(
