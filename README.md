@@ -1,68 +1,67 @@
-# Strive — Application de suivi d'activités sportives
+# Strive
 
-Application mobile type Strava réalisée avec React Native (Expo).
+> A Strava-style mobile app built with React Native and Expo: record GPS activities, see your route on a map and track your stats, all stored on the device.
 
-## Fonctionnalités
+![React Native](https://img.shields.io/badge/React_Native-0.81-61DAFB?logo=react&logoColor=white)
+![Expo](https://img.shields.io/badge/Expo-SDK_54-000020?logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-expo--sqlite-003B57?logo=sqlite&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-- **Authentification** : Création de compte, connexion, session persistante
-- **Enregistrement d'activité** : Démarrer / Pause / Reprendre / Arrêter
-- **Suivi GPS** : Collecte des points avec distance minimale 5–10 m, intervalle 1–3 s en mouvement
-- **Carte** : Affichage du tracé GPS des activités
-- **Statistiques** : Distance, durée, vitesse moyenne (activité et globales)
-- **Profil** : Modification des informations, gestion des permissions
-- **Background** : Suivi actif écran éteint ou app en arrière-plan (build natif requis)
+**Résumé (FR)** : application mobile de suivi d'activités sportives (type Strava) en React Native / Expo. Elle enregistre le parcours GPS (démarrer, pause, reprise, arrêt), l'affiche sur une carte, calcule distance, durée et vitesse, et exporte en GPX/CSV. Tout est stocké localement dans SQLite, sans serveur. Projet réalisé dans un cadre scolaire.
 
-## Prérequis
+## Features
 
-- Node.js 18+
-- Expo CLI (`npm install -g expo-cli`) ou `npx expo`
-- Application Expo Go sur téléphone (pour tests rapides)
-- Pour le suivi en arrière-plan : build de développement (`npx expo prebuild` + `npx expo run:android` ou `run:ios`)
+- Local accounts: sign up, log in, persistent session (`expo-secure-store`).
+- Activity recording: start / pause / resume / stop, with GPS points sampled by distance and time.
+- Background tracking while the screen is off (requires a development build, not Expo Go).
+- Route map (`react-native-maps`) and per-activity details.
+- Statistics: distance, duration, average speed, per-type stats and a line chart.
+- Personal achievements screen and local milestone notifications.
+- Export an activity as GPX or CSV.
+- Profile editing with a photo and permission management.
 
-## Installation
-
-```bash
-npm install
-```
-
-## Lancement
-
-```bash
-# Démarrer le serveur Expo
-npm start
-
-# Ou directement sur Android / iOS
-npm run android
-npm run ios
-```
-
-## Structure du projet
+## Architecture
 
 ```
 src/
-├── constants/     # Thème, couleurs
-├── context/       # AuthContext, RecordingContext
-├── navigation/    # AppNavigator
-├── screens/       # Écrans (Login, Home, Recording, Detail, Profile)
-├── services/      # database (SQLite), locationService
-├── types/         # Types TypeScript
-└── utils/         # Calculs GPS (haversine, formatage)
+├── components/   # UI pieces (map, charts, stat panels, badges)
+├── constants/    # theme, activity types
+├── context/      # AuthContext, RecordingContext
+├── hooks/        # location, permissions, map region
+├── navigation/   # AppNavigator (stack + bottom tabs)
+├── screens/      # Welcome, Login, Signup, Home, Recording, ActivityDetail, Leaderboard, Profile
+├── services/     # database (SQLite), locationService, notificationService, backgroundStore
+├── types/
+└── utils/        # GPS maths (haversine), formatters, export (GPX/CSV), auth (password hashing)
 ```
 
-## Notes techniques
+Data is stored only on the device (SQLite). There is no backend and no synchronisation.
 
-- **Expo Go** : Le suivi en arrière-plan peut être limité. Utiliser un développement build pour des tests complets.
-- **Carte** : `react-native-maps` fonctionne avec les tuiles par défaut. Pour Android en production, une clé API Google Maps peut être configurée dans `app.json` si nécessaire.
-- **Données** : Stockage local uniquement (SQLite via expo-sqlite). Pas de synchronisation serveur.
+## Getting started
 
-## Barème respecté
+Requirements: Node.js 20+ (Expo SDK 54 tooling prefers 22+), npm, and Expo Go or an Android/iOS emulator.
 
-- Enregistrement d'activité : Start / Pause / Stop ✓
-- Tracking GPS temps réel ✓
-- Sauvegarde et persistance ✓
-- Carte du parcours ✓
-- Statistiques ✓
-- Background tracking ✓
-- Structure du projet ✓
-- Gestion des permissions ✓
-- UX claire ✓
+```sh
+npm install
+npm start            # Expo dev server (scan the QR code with Expo Go)
+npm run android      # development build on Android
+npm run ios          # development build on iOS
+```
+
+Background location needs a development build (`npx expo prebuild` then `npm run android` / `npm run ios`); Expo Go limits it.
+
+## Tests
+
+No automated tests yet (see the open issues).
+
+## What it demonstrates
+
+- Cross-platform mobile development with React Native, Expo and strict TypeScript.
+- Foreground and background geolocation, permissions handling and local notifications.
+- Local persistence with SQLite and secure session storage.
+- A React context based architecture with React Navigation.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
