@@ -15,8 +15,9 @@ import {
   getUserByEmail,
   getUserById,
   updateUser,
+  updatePasswordHash,
 } from '../services/database';
-import { simpleHash } from '../utils/auth';
+import { hashPassword, needsRehash, verifyPassword } from '../utils/auth';
 import type { User } from '../types';
 
 const SESSION_KEY = 'strive_session_user_id';
@@ -70,7 +71,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(
     async (email: string, password: string): Promise<boolean> => {
       const u = await getUserByEmail(email);
-      if (!u || u.passwordHash !== simpleHash(password)) return false;
+      if (!u || !(await verifyPassword(password, u.passwordHash))) return false;
+      if (needsRehash(u.passwordHash)) {
+        await updatePasswordHash(u.id, await hashPassword(password));
+      }
       await SecureStore.setItemAsync(SESSION_KEY, u.id);
       setUser(u);
       return true;
@@ -83,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const existing = await getUserByEmail(email);
       if (existing) return false;
       const id = generateId();
-      await createUser(id, name.trim(), email.trim(), simpleHash(password));
+      await createUser(id, name.trim(), email.trim(), await hashPassword(password));
       await SecureStore.setItemAsync(SESSION_KEY, id);
       const u = await getUserById(id);
       if (u) setUser(u);
